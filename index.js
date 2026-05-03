@@ -36,6 +36,14 @@ async function run() {
     const reviewsCollection = foodiansDB.collection("reviews");
 
     // Reviews
+    // Featured Reviews
+    app.get("/featured-reviews", async(req, res) => {
+        const cursor = reviewsCollection.find().sort({rating: -1}).limit(6);
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+    
+    // Reviews
     app.get("/reviews", async(req, res) => {
         const cursor = reviewsCollection.find();
         const result = await cursor.toArray();
