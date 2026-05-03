@@ -44,7 +44,7 @@ async function run() {
 
     // Reviews
     app.get("/reviews", async (req, res) => {
-      const cursor = reviewsCollection.find();
+      const cursor = reviewsCollection.find().sort({createdAt : -1});
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -57,7 +57,12 @@ async function run() {
     });
 
     app.post("/reviews", async (req, res) => {
-      const newReview = req.body;
+      const review = req.body;
+      const newReview = {
+        ...review,
+        rating: Number(review.rating),
+        createdAt: new Date()
+      }
       const result = await reviewsCollection.insertOne(newReview);
       res.send(result);
     });
@@ -73,6 +78,21 @@ async function run() {
       const result = await reviewsCollection.updateOne(query, updateData, options);
       res.send(result);
     });
+
+    app.delete("/reviews/:id", async(req, res) => {
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)};
+        const result = await reviewsCollection.deleteOne(query);
+        res.send(result);
+    })
+
+    // My Reviews
+    app.get("/my-reviews", async(req, res) => {
+        const email = req.query.email;
+        const cursor = reviewsCollection.find().sort({createdAt: -1});
+        const result = await cursor.toArray();
+        res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
