@@ -1,7 +1,7 @@
-const express = require('express');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-require('dotenv').config()
-const cors = require('cors');
+const express = require("express");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+require("dotenv").config();
+const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -9,10 +9,9 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-
 app.get("/", (req, res) => {
-    res.send("Foodians is connected!");
-})
+  res.send("Foodians is connected!");
+});
 
 // MongoDB
 
@@ -24,7 +23,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 async function run() {
   try {
@@ -37,36 +36,49 @@ async function run() {
 
     // Reviews
     // Featured Reviews
-    app.get("/featured-reviews", async(req, res) => {
-        const cursor = reviewsCollection.find().sort({rating: -1}).limit(6);
-        const result = await cursor.toArray();
-        res.send(result);
-    })
-    
-    // Reviews
-    app.get("/reviews", async(req, res) => {
-        const cursor = reviewsCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
-    })
+    app.get("/featured-reviews", async (req, res) => {
+      const cursor = reviewsCollection.find().sort({ rating: -1 }).limit(6);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
-    app.get("/reviews/:id", async(req, res) => {
-        const id = req.params.id;
-        const query = {_id: new ObjectId(id)};
-        const result = await reviewsCollection.findOne(query);
-        res.send(result);
-    })
+    // Reviews
+    app.get("/reviews", async (req, res) => {
+      const cursor = reviewsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await reviewsCollection.findOne(query);
+      res.send(result);
+    });
 
     app.post("/reviews", async (req, res) => {
-        const newReview = req.body;
-        const result = await reviewsCollection.insertOne(newReview);
-        res.send(result);
-    })
+      const newReview = req.body;
+      const result = await reviewsCollection.insertOne(newReview);
+      res.send(result);
+    });
 
+    app.patch("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const updatedReview = req.body;
+      const updateData = {
+          $set: updatedReview
+      }
+      const options = {};
+      const result = await reviewsCollection.updateOne(query, updateData, options);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!",
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -74,7 +86,6 @@ async function run() {
 }
 run().catch(console.dir);
 
-
 app.listen(port, () => {
-    console.log(`Foodians server is running on port: ${port}`);
-})
+  console.log(`Foodians server is running on port: ${port}`);
+});
