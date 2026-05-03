@@ -89,7 +89,7 @@ async function run() {
     // My Reviews
     app.get("/my-reviews", async(req, res) => {
         const email = req.query.email;
-        const cursor = reviewsCollection.find().sort({createdAt: -1});
+        const cursor = reviewsCollection.find({user_email: email}).sort({createdAt: -1});
         const result = await cursor.toArray();
         res.send(result);
     })
