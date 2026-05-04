@@ -33,6 +33,7 @@ async function run() {
     // FoodiansDB
     const foodiansDB = client.db("FoodiansDB");
     const reviewsCollection = foodiansDB.collection("reviews");
+    const favoritesCollection = foodiansDB.collection("favorites");
 
     // Reviews
     // Featured Reviews
@@ -91,6 +92,34 @@ async function run() {
         const email = req.query.email;
         const cursor = reviewsCollection.find({user_email: email}).sort({createdAt: -1});
         const result = await cursor.toArray();
+        res.send(result);
+    })
+
+
+    // My Favorites
+    app.get("/favorites", async(req, res) => {
+        const email = req.query.email;
+        if(!email) {
+            return res.status(400).send({message: "Email is required."})
+        }
+        const cursor = favoritesCollection.find({user_email: email}).sort({createdAt: -1});
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+
+    app.post("/favorites", async(req, res) => {
+        const newFavorite = req.body;
+
+        const existedOne = await favoritesCollection.findOne({
+            reviewId : newFavorite.reviewId,
+            user_email: newFavorite.user_email
+        })
+
+        // avoid duplicate
+        if(existedOne) {
+            return res.send({message: "Already added to the Favorites!"})
+        }
+        const result = await favoritesCollection.insertOne({...newFavorite, createdAt: new Date()})
         res.send(result);
     })
 
