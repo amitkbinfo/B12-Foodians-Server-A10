@@ -95,7 +95,6 @@ async function run() {
         res.send(result);
     })
 
-
     // My Favorites
     app.get("/favorites", async(req, res) => {
         const email = req.query.email;
@@ -127,6 +126,13 @@ async function run() {
         const id = req.params.id;
         const query = {_id: new ObjectId(id)};
         const result = await favoritesCollection.deleteOne(query);
+        res.send(result);
+    })
+
+    // Search by Regex
+    app.get("/search", async(req, res) => {
+        const searchByName = req.query.search;
+        const result = await reviewsCollection.find({food_name: {$regex: searchByName, $options: "i"}}).toArray();
         res.send(result);
     })
 
