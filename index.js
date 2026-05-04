@@ -14,7 +14,6 @@ app.get("/", (req, res) => {
 });
 
 // MongoDB
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.i9wlk8b.mongodb.net/?appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -35,7 +34,6 @@ async function run() {
     const reviewsCollection = foodiansDB.collection("reviews");
     const favoritesCollection = foodiansDB.collection("favorites");
 
-    // Reviews
     // Featured Reviews
     app.get("/featured-reviews", async (req, res) => {
       const cursor = reviewsCollection.find().sort({ rating: -1 }).limit(6);
